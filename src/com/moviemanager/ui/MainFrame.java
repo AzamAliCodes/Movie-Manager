@@ -1,6 +1,8 @@
 package com.moviemanager.ui;
 
+import com.moviemanager.api.LogoAPI;
 import com.moviemanager.api.MovieAPI;
+import com.moviemanager.api.TmdbAPI;
 import com.moviemanager.api.WatchmodeAPI;
 import com.moviemanager.dao.MovieDAO;
 import com.moviemanager.dao.WatchlistDAO;
@@ -26,6 +28,7 @@ public class MainFrame extends JFrame {
     private MovieAPI movieAPI;
     private MovieDAO movieDAO;
     private WatchlistDAO watchlistDAO;
+    private LogoAPI logoAPI;
 
     private JComboBox<String> countryComboBox;
     private JTextField searchField;
@@ -40,6 +43,7 @@ public class MainFrame extends JFrame {
         this.movieAPI = new MovieAPI();
         this.movieDAO = new MovieDAO();
         this.watchlistDAO = new WatchlistDAO();
+        this.logoAPI = new LogoAPI();
 
         // Create the tables if they don't exist
         movieDAO.createTable();
@@ -210,28 +214,43 @@ public class MainFrame extends JFrame {
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(Theme.SECONDARY_BACKGROUND);
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
+
         JLabel titleLabel = new JLabel(movie.getTitle());
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
         titleLabel.setForeground(Theme.PRIMARY_TEXT);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         headerPanel.add(titleLabel);
 
-        JPanel subHeaderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel subHeaderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         subHeaderPanel.setBackground(Theme.SECONDARY_BACKGROUND);
+        subHeaderPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         JLabel yearLabel = new JLabel(movie.getYear());
         yearLabel.setForeground(Theme.SECONDARY_TEXT);
+        yearLabel.setFont(Theme.PLAIN_FONT);
         subHeaderPanel.add(yearLabel);
-        JLabel separator1 = new JLabel("|");
+
+        JLabel separator1 = new JLabel(" | ");
         separator1.setForeground(Theme.SECONDARY_TEXT);
+        separator1.setFont(Theme.PLAIN_FONT);
         subHeaderPanel.add(separator1);
+
         JLabel genreLabel = new JLabel(movie.getGenre());
         genreLabel.setForeground(Theme.SECONDARY_TEXT);
+        genreLabel.setFont(Theme.PLAIN_FONT);
         subHeaderPanel.add(genreLabel);
-        JLabel separator2 = new JLabel("|");
+
+        JLabel separator2 = new JLabel(" | ");
         separator2.setForeground(Theme.SECONDARY_TEXT);
+        separator2.setFont(Theme.PLAIN_FONT);
         subHeaderPanel.add(separator2);
+
         JLabel ratingLabel = new JLabel("IMDb Rating: " + movie.getImdbRating());
         ratingLabel.setForeground(Theme.SECONDARY_TEXT);
+        ratingLabel.setFont(Theme.PLAIN_FONT);
         subHeaderPanel.add(ratingLabel);
+
         headerPanel.add(subHeaderPanel);
         return headerPanel;
     }
@@ -270,8 +289,12 @@ public class MainFrame extends JFrame {
     }
 
     private JPanel createPosterPanel(Movie movie) {
-        JPanel posterPanel = new JPanel(new GridBagLayout());
+        JPanel posterPanel = new JPanel(new BorderLayout());
         posterPanel.setBackground(Theme.SECONDARY_BACKGROUND);
+        posterPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // Add padding
+
+        JLabel posterLabel = new JLabel();
+        posterLabel.setHorizontalAlignment(JLabel.CENTER);
         if (movie.getPosterUrl() != null && !movie.getPosterUrl().isEmpty()) {
             try {
                 URL posterUrl = new URL(movie.getPosterUrl());
@@ -279,12 +302,17 @@ public class MainFrame extends JFrame {
                 Image image = posterIcon.getImage();
                 Image newimg = image.getScaledInstance(200, 300,  java.awt.Image.SCALE_SMOOTH);
                 posterIcon = new ImageIcon(newimg);
-                JLabel posterLabel = new JLabel(posterIcon);
-                posterPanel.add(posterLabel);
+                posterLabel.setIcon(posterIcon);
             } catch (Exception e) {
                 e.printStackTrace();
+                posterLabel.setText("No Poster Available");
+                posterLabel.setForeground(Theme.SECONDARY_TEXT);
             }
+        } else {
+            posterLabel.setText("No Poster Available");
+            posterLabel.setForeground(Theme.SECONDARY_TEXT);
         }
+        posterPanel.add(posterLabel, BorderLayout.CENTER);
         return posterPanel;
     }
 
@@ -308,7 +336,8 @@ public class MainFrame extends JFrame {
         plotArea.setWrapStyleWord(true);
         plotArea.setEditable(false);
         plotArea.setBackground(Theme.SECONDARY_BACKGROUND);
-        plotArea.setForeground(Theme.PRIMARY_TEXT);
+        plotArea.setForeground(Theme.SECONDARY_TEXT);
+        plotArea.setMargin(new Insets(5, 5, 5, 5)); // Add padding
         JScrollPane plotScrollPane = new JScrollPane(plotArea);
         plotScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Theme.SECONDARY_TEXT), "Plot", TitledBorder.LEFT, TitledBorder.TOP, Theme.PLAIN_FONT, Theme.SECONDARY_TEXT));
         detailsPanel.add(plotScrollPane, detailsGbc);
@@ -320,6 +349,7 @@ public class MainFrame extends JFrame {
         detailsGbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel directorLabel = new JLabel("Director: " + movie.getDirector());
         directorLabel.setForeground(Theme.SECONDARY_TEXT);
+        directorLabel.setFont(Theme.PLAIN_FONT);
         detailsPanel.add(directorLabel, detailsGbc);
 
         // Actors
@@ -327,15 +357,16 @@ public class MainFrame extends JFrame {
         detailsGbc.gridy = 2;
         JLabel actorsLabel = new JLabel("Actors: " + movie.getActors());
         actorsLabel.setForeground(Theme.SECONDARY_TEXT);
+        actorsLabel.setFont(Theme.PLAIN_FONT);
         detailsPanel.add(actorsLabel, detailsGbc);
 
         return detailsPanel;
     }
 
     private JPanel createStreamingPanel(Movie movie) {
-        JPanel rightPanel = new JPanel(new GridLayout(0, 1));
+        JPanel rightPanel = new JPanel(new GridLayout(0, 1, 0, 5)); // Add vertical gap
         rightPanel.setBackground(Theme.SECONDARY_BACKGROUND);
-        rightPanel.setBorder(BorderFactory.createTitledBorder(null, "Available on", 0, 0, null, Theme.SECONDARY_TEXT));
+        rightPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Theme.SECONDARY_TEXT), "Available on", TitledBorder.LEFT, TitledBorder.TOP, Theme.PLAIN_FONT, Theme.SECONDARY_TEXT));
         List<StreamingInfo> streamingInfos = watchmodeAPI.getStreamingInfo(movie.getTitle(), (String) countryComboBox.getSelectedItem());
         if (streamingInfos != null && !streamingInfos.isEmpty()) {
             for (StreamingInfo info : streamingInfos) {
@@ -358,6 +389,23 @@ public class MainFrame extends JFrame {
                         break;
                 }
                 JButton streamingButton = new JButton(buttonText);
+
+                try {
+                    String domain = new URL(info.getUrl()).getHost();
+                    String logoUrl = logoAPI.getLogoUrl(domain);
+                    ImageIcon logoIcon = new ImageIcon(new URL(logoUrl));
+                    if (logoIcon.getIconWidth() != -1 && logoIcon.getIconHeight() != -1) {
+                        Image image = logoIcon.getImage();
+                        Image newimg = image.getScaledInstance(32, 32,  java.awt.Image.SCALE_SMOOTH);
+                        logoIcon = new ImageIcon(newimg);
+                        streamingButton.setIcon(logoIcon);
+                        streamingButton.setHorizontalTextPosition(SwingConstants.RIGHT);
+                        streamingButton.setIconTextGap(10);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 streamingButton.setBackground(Theme.COMPONENT_BACKGROUND);
                 streamingButton.setForeground(Theme.PRIMARY_TEXT);
                 streamingButton.setFont(Theme.PLAIN_FONT);
