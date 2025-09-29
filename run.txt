@@ -1,0 +1,1 @@
+java -cp "out;lib/gson-2.8.9.jar;lib/sqlite-jdbc-3.36.0.3.jar" com.moviemanager.Main
