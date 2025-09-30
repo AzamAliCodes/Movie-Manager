@@ -11,6 +11,8 @@ import com.moviemanager.model.StreamingInfo;
 import com.moviemanager.model.WatchlistItem;
 import com.moviemanager.theme.Theme;
 import com.moviemanager.theme.RoundedBorder;
+import java.awt.FlowLayout;
+import com.moviemanager.ui.WrapLayout;
 
 import javax.swing.*;
 import java.awt.*;
@@ -488,7 +490,7 @@ public class MainFrame extends JFrame {
                         emptyLabel.setHorizontalAlignment(SwingConstants.CENTER);
                         watchlistPanel.add(emptyLabel, BorderLayout.CENTER);
                     } else {
-                        JPanel cardsPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 10, 10));
+                        JPanel cardsPanel = new JPanel(new GridLayout(0, 2, 10, 10)); // 0 rows, 2 columns, 10px hgap, 10px vgap
                         cardsPanel.setBackground(Theme.SECONDARY_BACKGROUND);
                         cardsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -515,7 +517,7 @@ public class MainFrame extends JFrame {
 
     private JPanel createWatchlistCardPanel(WatchlistItem item) {
         JPanel cardPanel = new JPanel(new BorderLayout(10, 10));
-        cardPanel.setPreferredSize(new Dimension(340, 170));
+        cardPanel.setPreferredSize(new Dimension(350, 170));
         cardPanel.setBackground(Theme.COMPONENT_BACKGROUND);
         cardPanel.setBorder(BorderFactory.createLineBorder(Theme.ACCENT_ORANGE, 1));
 
