@@ -15,6 +15,7 @@ public class ButtonEditor extends DefaultCellEditor {
     private boolean isPushed;
     private List<WatchlistItem> watchlistItems;
     private MainFrame mainFrame;
+    private JTable table;
 
     public ButtonEditor(JCheckBox checkBox, List<WatchlistItem> watchlistItems, MainFrame mainFrame) {
         super(checkBox);
@@ -32,6 +33,7 @@ public class ButtonEditor extends DefaultCellEditor {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        this.table = table;
         if (isSelected) {
             button.setForeground(table.getSelectionForeground());
             button.setBackground(table.getSelectionBackground());
@@ -48,7 +50,7 @@ public class ButtonEditor extends DefaultCellEditor {
     @Override
     public Object getCellEditorValue() {
         if (isPushed) {
-            int selectedRow = ((JTable) getComponent().getParent()).getSelectedRow();
+            int selectedRow = table.getSelectedRow();
             if (selectedRow != -1 && selectedRow < watchlistItems.size()) {
                 WatchlistItem item = watchlistItems.get(selectedRow);
                 mainFrame.removeWatchlistItem(item.getId());

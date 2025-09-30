@@ -30,6 +30,11 @@ public class MovieDAO {
     }
 
     public int addMovie(Movie movie) {
+        Movie existingMovie = getMovieByImdbID(movie.getImdbID());
+        if (existingMovie != null) {
+            return existingMovie.getId();
+        }
+
         String sql = "INSERT INTO movies(title, year, genre, rating, description, posterUrl, imdbID) VALUES(?,?,?,?,?,?,?)";
         int id = 0;
 

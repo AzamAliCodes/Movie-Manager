@@ -8,6 +8,7 @@ import com.moviemanager.dao.MovieDAO;
 import com.moviemanager.dao.WatchlistDAO;
 import com.moviemanager.model.Movie;
 import com.moviemanager.model.StreamingInfo;
+import com.moviemanager.model.WatchlistItem;
 import com.moviemanager.theme.Theme;
 import com.moviemanager.theme.RoundedBorder;
 
@@ -134,7 +135,7 @@ public class MainFrame extends JFrame {
 
         tabbedPane.addChangeListener(e -> {
             if (tabbedPane.getSelectedIndex() == 1) { // Watchlist tab
-                populateWatchlistTable();
+                populateWatchlist();
             }
         });
 
@@ -211,47 +212,35 @@ public class MainFrame extends JFrame {
     }
 
     private JPanel createHeaderPanel(Movie movie) {
-        JPanel headerPanel = new JPanel();
+        JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(Theme.SECONDARY_BACKGROUND);
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JLabel titleLabel = new JLabel(movie.getTitle());
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 32));
         titleLabel.setForeground(Theme.PRIMARY_TEXT);
-        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        headerPanel.add(titleLabel);
+        headerPanel.add(titleLabel, BorderLayout.NORTH);
 
-        JPanel subHeaderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        JPanel subHeaderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 5));
         subHeaderPanel.setBackground(Theme.SECONDARY_BACKGROUND);
-        subHeaderPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel yearLabel = new JLabel(movie.getYear());
+        JLabel yearLabel = new JLabel("📅 " + movie.getYear());
         yearLabel.setForeground(Theme.SECONDARY_TEXT);
         yearLabel.setFont(Theme.PLAIN_FONT);
         subHeaderPanel.add(yearLabel);
 
-        JLabel separator1 = new JLabel(" | ");
-        separator1.setForeground(Theme.SECONDARY_TEXT);
-        separator1.setFont(Theme.PLAIN_FONT);
-        subHeaderPanel.add(separator1);
-
-        JLabel genreLabel = new JLabel(movie.getGenre());
+        JLabel genreLabel = new JLabel("🎬 " + movie.getGenre());
         genreLabel.setForeground(Theme.SECONDARY_TEXT);
         genreLabel.setFont(Theme.PLAIN_FONT);
         subHeaderPanel.add(genreLabel);
 
-        JLabel separator2 = new JLabel(" | ");
-        separator2.setForeground(Theme.SECONDARY_TEXT);
-        separator2.setFont(Theme.PLAIN_FONT);
-        subHeaderPanel.add(separator2);
-
-        JLabel ratingLabel = new JLabel("IMDb Rating: " + movie.getImdbRating());
+        JLabel ratingLabel = new JLabel("⭐ " + movie.getImdbRating());
         ratingLabel.setForeground(Theme.SECONDARY_TEXT);
         ratingLabel.setFont(Theme.PLAIN_FONT);
         subHeaderPanel.add(ratingLabel);
 
-        headerPanel.add(subHeaderPanel);
+        headerPanel.add(subHeaderPanel, BorderLayout.CENTER);
+
         return headerPanel;
     }
 
@@ -329,21 +318,32 @@ public class MainFrame extends JFrame {
         detailsGbc.gridx = 0;
         detailsGbc.gridy = 0;
         detailsGbc.weightx = 1;
-        detailsGbc.weighty = 1; // Give more vertical space to plot
+        detailsGbc.weighty = 1;
         detailsGbc.fill = GridBagConstraints.BOTH;
+
+        JPanel plotPanel = new JPanel(new BorderLayout());
+        plotPanel.setBackground(Theme.SECONDARY_BACKGROUND);
+
+        JLabel plotTitleLabel = new JLabel("Plot");
+        plotTitleLabel.setFont(Theme.BOLD_FONT);
+        plotTitleLabel.setForeground(Theme.PRIMARY_TEXT);
+        plotTitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        plotPanel.add(plotTitleLabel, BorderLayout.NORTH);
+
         JTextArea plotArea = new JTextArea(movie.getPlot());
         plotArea.setLineWrap(true);
         plotArea.setWrapStyleWord(true);
         plotArea.setEditable(false);
-        plotArea.setBackground(Theme.SECONDARY_BACKGROUND);
+        plotArea.setBackground(Theme.COMPONENT_BACKGROUND);
         plotArea.setForeground(Theme.SECONDARY_TEXT);
-        plotArea.setMargin(new Insets(5, 5, 5, 5)); // Add padding
+        plotArea.setMargin(new Insets(5, 5, 5, 5));
         JScrollPane plotScrollPane = new JScrollPane(plotArea);
-        plotScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Theme.SECONDARY_TEXT), "Plot", TitledBorder.LEFT, TitledBorder.TOP, Theme.PLAIN_FONT, Theme.SECONDARY_TEXT));
-        detailsPanel.add(plotScrollPane, detailsGbc);
+        plotScrollPane.setBorder(BorderFactory.createLineBorder(Theme.SECONDARY_TEXT));
+        plotPanel.add(plotScrollPane, BorderLayout.CENTER);
+
+        detailsPanel.add(plotPanel, detailsGbc);
 
         // Director
-        detailsGbc.gridx = 0;
         detailsGbc.gridy = 1;
         detailsGbc.weighty = 0;
         detailsGbc.fill = GridBagConstraints.HORIZONTAL;
@@ -353,7 +353,6 @@ public class MainFrame extends JFrame {
         detailsPanel.add(directorLabel, detailsGbc);
 
         // Actors
-        detailsGbc.gridx = 0;
         detailsGbc.gridy = 2;
         JLabel actorsLabel = new JLabel("Actors: " + movie.getActors());
         actorsLabel.setForeground(Theme.SECONDARY_TEXT);
@@ -438,54 +437,187 @@ public class MainFrame extends JFrame {
         addToWatchlistButton.setFocusPainted(false);
         addToWatchlistButton.setBorder(new RoundedBorder(8));
         addToWatchlistButton.addActionListener(e -> {
-            Movie existingMovie = movieDAO.getMovieByImdbID(movie.getImdbID());
-            int movieId;
-            if (existingMovie == null) {
-                movieId = movieDAO.addMovie(movie);
+            int movieId = movieDAO.addMovie(movie);
+            if (watchlistDAO.addToWatchlist(movieId, "To Watch")) {
+                JOptionPane.showMessageDialog(this, "Movie added to watchlist!", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                movieId = existingMovie.getId();
+                JOptionPane.showMessageDialog(this, "Movie is already in the watchlist.", "Info", JOptionPane.INFORMATION_MESSAGE);
             }
-            watchlistDAO.addToWatchlist(movieId, "To Watch");
-            JOptionPane.showMessageDialog(this, "Movie added to watchlist!", "Success", JOptionPane.INFORMATION_MESSAGE);
         });
         buttonPanel.add(addToWatchlistButton);
         return buttonPanel;
     }
 
-    private void populateWatchlistTable() {
+    private void populateWatchlist() {
         watchlistPanel.removeAll();
-
-        java.util.List<com.moviemanager.model.WatchlistItem> watchlistItems = watchlistDAO.getWatchlist();
-        String[] columnNames = {"Title", "Year", "Genre", "Rating", "Status", "Remove"};
-
-        Object[][] data = new Object[watchlistItems.size()][6];
-        for (int i = 0; i < watchlistItems.size(); i++) {
-            com.moviemanager.model.WatchlistItem item = watchlistItems.get(i);
-            Movie movie = movieDAO.getMovieById(item.getMovieId());
-            if (movie != null) {
-                data[i][0] = movie.getTitle();
-                data[i][1] = movie.getYear();
-                data[i][2] = movie.getGenre();
-                data[i][3] = movie.getImdbRating();
-                data[i][4] = item.getStatus();
-                data[i][5] = "Remove";
-            }
-        }
-
-        JTable watchlistTable = new JTable(data, columnNames);
-        watchlistTable.getColumn("Remove").setCellRenderer(new ButtonRenderer());
-        watchlistTable.getColumn("Remove").setCellEditor(new ButtonEditor(new JCheckBox(), watchlistItems, this));
-
-        JScrollPane scrollPane = new JScrollPane(watchlistTable);
-        watchlistPanel.add(scrollPane, BorderLayout.CENTER);
-
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        watchlistPanel.setLayout(new GridBagLayout());
+        watchlistPanel.add(progressBar);
         watchlistPanel.revalidate();
         watchlistPanel.repaint();
+
+        SwingWorker<List<WatchlistItem>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<WatchlistItem> doInBackground() throws Exception {
+                return watchlistDAO.getWatchlist();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    List<WatchlistItem> watchlistItems = get();
+                    watchlistPanel.removeAll();
+                    watchlistPanel.setLayout(new BorderLayout());
+                    watchlistPanel.setBackground(Theme.SECONDARY_BACKGROUND);
+
+                    // Header
+                    JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                    headerPanel.setBackground(Theme.SECONDARY_BACKGROUND);
+                    headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                    JLabel titleLabel = new JLabel("My Watchlist");
+                    titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
+                    titleLabel.setForeground(Theme.PRIMARY_TEXT);
+                    headerPanel.add(titleLabel);
+                    watchlistPanel.add(headerPanel, BorderLayout.NORTH);
+
+                    if (watchlistItems.isEmpty()) {
+                        JLabel emptyLabel = new JLabel("Your watchlist is empty.");
+                        emptyLabel.setFont(Theme.PLAIN_FONT);
+                        emptyLabel.setForeground(Theme.SECONDARY_TEXT);
+                        emptyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                        watchlistPanel.add(emptyLabel, BorderLayout.CENTER);
+                    } else {
+                        JPanel cardsPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 10, 10));
+                        cardsPanel.setBackground(Theme.SECONDARY_BACKGROUND);
+                        cardsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+                        for (WatchlistItem item : watchlistItems) {
+                            cardsPanel.add(createWatchlistCardPanel(item));
+                        }
+
+                        JScrollPane scrollPane = new JScrollPane(cardsPanel);
+                        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+                        scrollPane.getViewport().setBackground(Theme.SECONDARY_BACKGROUND);
+                        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+                        watchlistPanel.add(scrollPane, BorderLayout.CENTER);
+                    }
+
+                    watchlistPanel.revalidate();
+                    watchlistPanel.repaint();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        worker.execute();
+    }
+
+    private JPanel createWatchlistCardPanel(WatchlistItem item) {
+        JPanel cardPanel = new JPanel(new BorderLayout(10, 10));
+        cardPanel.setPreferredSize(new Dimension(340, 170));
+        cardPanel.setBackground(Theme.COMPONENT_BACKGROUND);
+        cardPanel.setBorder(BorderFactory.createLineBorder(Theme.ACCENT_ORANGE, 1));
+
+        Movie movie = item.getMovie();
+
+        // Poster
+        JLabel posterLabel = new JLabel();
+        posterLabel.setPreferredSize(new Dimension(100, 150));
+        if (movie.getPosterUrl() != null && !movie.getPosterUrl().isEmpty()) {
+            try {
+                URL posterUrl = new URL(movie.getPosterUrl());
+                ImageIcon posterIcon = new ImageIcon(posterUrl);
+                Image image = posterIcon.getImage();
+                Image newimg = image.getScaledInstance(100, 150,  java.awt.Image.SCALE_SMOOTH);
+                posterIcon = new ImageIcon(newimg);
+                posterLabel.setIcon(posterIcon);
+            } catch (Exception e) {
+                e.printStackTrace();
+                posterLabel.setText("No Poster");
+            }
+        } else {
+            posterLabel.setText("No Poster");
+        }
+        cardPanel.add(posterLabel, BorderLayout.WEST);
+
+        // Details and Actions
+        JPanel detailsActionsPanel = new JPanel(new BorderLayout());
+        detailsActionsPanel.setBackground(Theme.COMPONENT_BACKGROUND);
+
+        // Details
+        JPanel detailsPanel = new JPanel();
+        detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
+        detailsPanel.setBackground(Theme.COMPONENT_BACKGROUND);
+
+        JLabel titleLabel = new JLabel(movie.getTitle());
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        titleLabel.setForeground(Theme.PRIMARY_TEXT);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        detailsPanel.add(titleLabel);
+
+        JLabel yearLabel = new JLabel("📅 " + movie.getYear());
+        yearLabel.setFont(Theme.PLAIN_FONT);
+        yearLabel.setForeground(Theme.SECONDARY_TEXT);
+        yearLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        detailsPanel.add(yearLabel);
+
+        JLabel genreLabel = new JLabel("🎬 " + movie.getGenre());
+        genreLabel.setFont(Theme.PLAIN_FONT);
+        genreLabel.setForeground(Theme.SECONDARY_TEXT);
+        genreLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        detailsPanel.add(genreLabel);
+
+        JLabel ratingLabel = new JLabel("⭐ " + movie.getImdbRating());
+        ratingLabel.setFont(Theme.PLAIN_FONT);
+        ratingLabel.setForeground(Theme.SECONDARY_TEXT);
+        ratingLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        detailsPanel.add(ratingLabel);
+
+        detailsActionsPanel.add(detailsPanel, BorderLayout.CENTER);
+
+        // Actions
+        JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        actionsPanel.setBackground(Theme.COMPONENT_BACKGROUND);
+
+        JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"To Watch", "Watched", "On Hold", "Dropped"});
+        statusComboBox.setSelectedItem(item.getStatus());
+        statusComboBox.addActionListener(e -> {
+            String newStatus = (String) statusComboBox.getSelectedItem();
+            if (!item.getStatus().equals(newStatus)) {
+                watchlistDAO.updateWatchlistStatus(item.getId(), newStatus);
+                item.setStatus(newStatus);
+            }
+        });
+        actionsPanel.add(statusComboBox);
+
+        JButton removeButton = new JButton("Remove");
+        removeButton.setBackground(Theme.ACCENT_ORANGE);
+        removeButton.setForeground(Theme.PRIMARY_TEXT);
+        removeButton.addActionListener(e -> removeWatchlistItem(item.getId()));
+        actionsPanel.add(removeButton);
+
+        detailsActionsPanel.add(actionsPanel, BorderLayout.SOUTH);
+
+        cardPanel.add(detailsActionsPanel, BorderLayout.CENTER);
+
+        return cardPanel;
     }
 
     public void removeWatchlistItem(int watchlistItemId) {
-        watchlistDAO.removeFromWatchlist(watchlistItemId);
-        populateWatchlistTable();
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                watchlistDAO.removeFromWatchlist(watchlistItemId);
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                populateWatchlist();
+            }
+        };
+        worker.execute();
     }
 
 }

@@ -6,15 +6,21 @@ A simple movie search and watchlist manager application built with Java and Swin
 
 ## Preview
 
-![Preview](preview1.png)
+### Search Page
+![Search Page](previewSearch.png)
+
+### Watchlist Page
+![Watchlist Page](previewWatchlist.png)
 
 ## Features
 
-- Search for movies by title.
-- View movie details, including poster, plot, director, actors, and IMDb rating.
-- View streaming information for movies.
-- Add movies to a watchlist.
-- View and manage the watchlist.
+- **Movie Search:** Search for movies by title and view detailed information, including poster, plot, director, actors, and IMDb rating.
+- **Streaming Information:** Find out where to stream movies online with information from various streaming services.
+- **Watchlist Management:**
+    - Add movies to your personal watchlist.
+    - View your watchlist in a modern card-based layout.
+    - Change the status of each movie in your watchlist (e.g., "To Watch", "Watched", "On Hold", "Dropped").
+    - Remove movies from your watchlist.
 
 ## API Usage
 
