@@ -4,6 +4,10 @@
 
 A simple movie search and watchlist manager application built with Java and Swing. This application allows users to search for movies, view their details, and manage a personal watchlist. It utilizes several APIs to fetch movie data, trending shows, and streaming information.
 
+## Preview
+
+![Preview](preview1.png)
+
 ## Features
 
 - Search for movies by title.
