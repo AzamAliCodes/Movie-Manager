@@ -42,3 +42,42 @@ This application uses the following APIs:
 - logo.dev API (for OTT platform logos)
 - Gson (for parsing JSON)
 - java-dotenv (for managing environment variables)
+
+## Future Enhancements
+
+We have an extensive list of feature suggestions to make Movie Manager even better! Check out [FEATURE_SUGGESTIONS.md](FEATURE_SUGGESTIONS.md) for:
+
+- 🎯 **High Priority Features**: Advanced search & filtering, enhanced watchlist features, movie recommendations, and TV series support
+- 💡 **Medium Priority Features**: UI enhancements, social & sharing features, notifications, and enhanced movie information
+- 🔧 **Technical Enhancements**: Cloud sync, additional API integrations, and performance improvements
+- 🎨 **Creative Features**: Gamification, analytics & insights, and advanced organization
+- 🌐 **Platform Extensions**: Multi-platform support, import/export features, and accessibility improvements
+
+### Quick Roadmap
+
+#### Phase 1 - Core Improvements
+- [ ] Advanced search filters (genre, year, rating)
+- [ ] Personal notes and ratings for watchlist items
+- [ ] Watch date tracking
+- [ ] Watchlist export (CSV/PDF)
+- [ ] Theme customization
+
+#### Phase 2 - Content Expansion
+- [ ] TV Series support
+- [ ] Episode tracking
+- [ ] Movie recommendations
+- [ ] Trailer integration
+- [ ] Enhanced movie details
+
+#### Phase 3 - Smart Features
+- [ ] Watchlist statistics and analytics
+- [ ] Collections and custom categories
+- [ ] Cloud sync
+- [ ] Multi-user profiles
+- [ ] Social sharing features
+
+For the complete list of feature suggestions, see [FEATURE_SUGGESTIONS.md](FEATURE_SUGGESTIONS.md)
+
+## Contributing
+
+We welcome contributions! Whether it's implementing new features, fixing bugs, or improving documentation, your help is appreciated. Please check out our [feature suggestions](FEATURE_SUGGESTIONS.md) for ideas on what to work on.
