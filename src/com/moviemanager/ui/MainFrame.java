@@ -13,6 +13,7 @@ import com.moviemanager.theme.Theme;
 import com.moviemanager.theme.RoundedBorder;
 import java.awt.FlowLayout;
 import com.moviemanager.ui.WrapLayout;
+import com.moviemanager.ui.TrendingPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -128,6 +129,10 @@ public class MainFrame extends JFrame {
 
         tabbedPane.addTab("Home", searchPanel);
 
+        // Trending Panel
+        TrendingPanel trendingPanel = new TrendingPanel();
+        tabbedPane.addTab("Trending", trendingPanel);
+
         // Watchlist Panel
         watchlistPanel = new JPanel(new BorderLayout());
         watchlistPanel.setBackground(Theme.SECONDARY_BACKGROUND);
@@ -136,7 +141,7 @@ public class MainFrame extends JFrame {
         tabbedPane.setSelectedIndex(0); // Set Home tab as default
 
         tabbedPane.addChangeListener(e -> {
-            if (tabbedPane.getSelectedIndex() == 1) { // Watchlist tab
+            if (tabbedPane.getSelectedIndex() == 2) { // Watchlist tab
                 populateWatchlist();
             }
         });
@@ -282,7 +287,8 @@ public class MainFrame extends JFrame {
     private JPanel createPosterPanel(Movie movie) {
         JPanel posterPanel = new JPanel(new BorderLayout());
         posterPanel.setBackground(Theme.SECONDARY_BACKGROUND);
-        posterPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // Add padding
+        posterPanel.setBorder(BorderFactory.createEmptyBorder());
+        posterPanel.setOpaque(false);
 
         JLabel posterLabel = new JLabel();
         posterLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -340,7 +346,7 @@ public class MainFrame extends JFrame {
         plotArea.setForeground(Theme.SECONDARY_TEXT);
         plotArea.setMargin(new Insets(5, 5, 5, 5));
         JScrollPane plotScrollPane = new JScrollPane(plotArea);
-        plotScrollPane.setBorder(BorderFactory.createLineBorder(Theme.SECONDARY_TEXT));
+        plotScrollPane.setBorder(BorderFactory.createEmptyBorder());
         plotPanel.add(plotScrollPane, BorderLayout.CENTER);
 
         detailsPanel.add(plotPanel, detailsGbc);
@@ -367,7 +373,8 @@ public class MainFrame extends JFrame {
     private JPanel createStreamingPanel(Movie movie) {
         JPanel rightPanel = new JPanel(new GridLayout(0, 1, 0, 5)); // Add vertical gap
         rightPanel.setBackground(Theme.SECONDARY_BACKGROUND);
-        rightPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Theme.SECONDARY_TEXT), "Available on", TitledBorder.LEFT, TitledBorder.TOP, Theme.PLAIN_FONT, Theme.SECONDARY_TEXT));
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(new RoundedBorder(10), "Available on", TitledBorder.LEFT, TitledBorder.TOP, Theme.PLAIN_FONT, Theme.SECONDARY_TEXT);
+        rightPanel.setBorder(titledBorder);
         List<StreamingInfo> streamingInfos = watchmodeAPI.getStreamingInfo(movie.getTitle(), (String) countryComboBox.getSelectedItem());
         if (streamingInfos != null && !streamingInfos.isEmpty()) {
             for (StreamingInfo info : streamingInfos) {
@@ -452,10 +459,26 @@ public class MainFrame extends JFrame {
 
     private void populateWatchlist() {
         watchlistPanel.removeAll();
+        watchlistPanel.setLayout(new BorderLayout());
+
+        // Header
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        headerPanel.setBackground(Theme.SECONDARY_BACKGROUND);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JLabel titleLabel = new JLabel("My Watchlist");
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
+        titleLabel.setForeground(Theme.PRIMARY_TEXT);
+        headerPanel.add(titleLabel);
+        watchlistPanel.add(headerPanel, BorderLayout.NORTH);
+
+        // Content Panel
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setBackground(Theme.SECONDARY_BACKGROUND);
         JProgressBar progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
-        watchlistPanel.setLayout(new GridBagLayout());
-        watchlistPanel.add(progressBar);
+        contentPanel.add(progressBar);
+        watchlistPanel.add(contentPanel, BorderLayout.CENTER);
+
         watchlistPanel.revalidate();
         watchlistPanel.repaint();
 
@@ -469,26 +492,15 @@ public class MainFrame extends JFrame {
             protected void done() {
                 try {
                     List<WatchlistItem> watchlistItems = get();
-                    watchlistPanel.removeAll();
-                    watchlistPanel.setLayout(new BorderLayout());
-                    watchlistPanel.setBackground(Theme.SECONDARY_BACKGROUND);
-
-                    // Header
-                    JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                    headerPanel.setBackground(Theme.SECONDARY_BACKGROUND);
-                    headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                    JLabel titleLabel = new JLabel("My Watchlist");
-                    titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
-                    titleLabel.setForeground(Theme.PRIMARY_TEXT);
-                    headerPanel.add(titleLabel);
-                    watchlistPanel.add(headerPanel, BorderLayout.NORTH);
+                    contentPanel.removeAll();
+                    contentPanel.setLayout(new BorderLayout());
 
                     if (watchlistItems.isEmpty()) {
                         JLabel emptyLabel = new JLabel("Your watchlist is empty.");
                         emptyLabel.setFont(Theme.PLAIN_FONT);
                         emptyLabel.setForeground(Theme.SECONDARY_TEXT);
                         emptyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                        watchlistPanel.add(emptyLabel, BorderLayout.CENTER);
+                        contentPanel.add(emptyLabel, BorderLayout.CENTER);
                     } else {
                         JPanel cardsPanel = new JPanel(new GridLayout(0, 2, 10, 10)); // 0 rows, 2 columns, 10px hgap, 10px vgap
                         cardsPanel.setBackground(Theme.SECONDARY_BACKGROUND);
@@ -502,11 +514,11 @@ public class MainFrame extends JFrame {
                         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
                         scrollPane.getViewport().setBackground(Theme.SECONDARY_BACKGROUND);
                         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-                        watchlistPanel.add(scrollPane, BorderLayout.CENTER);
+                        contentPanel.add(scrollPane, BorderLayout.CENTER);
                     }
 
-                    watchlistPanel.revalidate();
-                    watchlistPanel.repaint();
+                    contentPanel.revalidate();
+                    contentPanel.repaint();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -519,7 +531,8 @@ public class MainFrame extends JFrame {
         JPanel cardPanel = new JPanel(new BorderLayout(10, 10));
         cardPanel.setPreferredSize(new Dimension(350, 170));
         cardPanel.setBackground(Theme.COMPONENT_BACKGROUND);
-        cardPanel.setBorder(BorderFactory.createLineBorder(Theme.ACCENT_ORANGE, 1));
+        cardPanel.setBorder(new RoundedBorder(10));
+        cardPanel.setOpaque(false);
 
         Movie movie = item.getMovie();
 

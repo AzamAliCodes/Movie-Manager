@@ -17,3 +17,4 @@ C:\Users\emaza\Desktop\Movie-Manager\src\com\moviemanager\ui\ButtonRenderer.java
 C:\Users\emaza\Desktop\Movie-Manager\src\com\moviemanager\ui\HomePagePanel.java 
 C:\Users\emaza\Desktop\Movie-Manager\src\com\moviemanager\ui\MainFrame.java 
 C:\Users\emaza\Desktop\Movie-Manager\src\com\moviemanager\ui\WrapLayout.java 
+C:\Users\emaza\Desktop\Movie-Manager\src\com\moviemanager\ui\TrendingPanel.java

@@ -6,9 +6,16 @@ import java.awt.*;
 public class RoundedBorder implements Border {
 
     private int radius;
+    private Color color;
 
     public RoundedBorder(int radius) {
         this.radius = radius;
+        this.color = Theme.ACCENT_ORANGE; // Default color
+    }
+
+    public RoundedBorder(int radius, Color color) {
+        this.radius = radius;
+        this.color = color;
     }
 
     @Override
@@ -23,6 +30,7 @@ public class RoundedBorder implements Border {
 
     @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+        g.setColor(this.color);
         g.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
     }
 }
