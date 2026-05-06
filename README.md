@@ -7,10 +7,13 @@ A simple movie search and watchlist manager application built with Java and Swin
 ## Preview
 
 ### Search Page
-![Search Page](previewSearch.png)
+![Search Page](preview/search.png)
+
+### Trending Page
+![Trending Page](preview/trending.png)
 
 ### Watchlist Page
-![Watchlist Page](previewWatchlist.png)
+![Watchlist Page](preview/watchlist.png)
 
 ## Features
 
@@ -42,4 +45,36 @@ This application uses the following APIs:
 - logo.dev API (for OTT platform logos)
 - Gson (for parsing JSON)
 - java-dotenv (for managing environment variables)
+
+## Local Setup
+
+### Prerequisites
+- Java Development Kit (JDK) 11 or higher.
+- SQLite.
+
+### Installation & Configuration
+1. Clone the repository.
+2. Provide your API keys in a `.env` file in the root directory (refer to `.env.sample` for the required keys).
+   ```env
+   OMDB_API_KEY=your_key_here
+   TMDB_API_KEY=your_key_here
+   WATCHMODE_API_KEY=your_key_here
+   LOGO_DEV_API_KEY=your_key_here
+   ```
+
+### Running the Application
+
+**Windows:**
+Execute the provided batch script:
+```bash
+./run.bat
+```
+
+**macOS / Linux:**
+Run the following command in your terminal:
+```bash
+java -cp "out:lib/*" com.moviemanager.Main
+```
+*(Note: Ensure you have compiled the source files into the `out` directory first.)*
+
   
