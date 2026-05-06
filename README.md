@@ -70,11 +70,17 @@ Execute the provided batch script:
 ./run.bat
 ```
 
+**Note on Compilation:**
+The project uses `java_files.txt` to list all Java source files for compilation. If you add new `.java` files to the project, make sure to add their relative paths to `java_files.txt` to ensure they are included in the build.
+
 **macOS / Linux:**
 Run the following command in your terminal:
 ```bash
+# Compile
+javac -cp "lib/*" -d out @java_files.txt
+
+# Run
 java -cp "out:lib/*" com.moviemanager.Main
 ```
-*(Note: Ensure you have compiled the source files into the `out` directory first.)*
 
   
